@@ -1,0 +1,6 @@
+state.db
+state.db-journal
+state.db-wal
+state.db-shm
+__pycache__/
+llm.json

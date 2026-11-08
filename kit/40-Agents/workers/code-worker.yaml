@@ -1,0 +1,38 @@
+# CodeWorker：代码评审与 CI 分析（强模型，上下文隔离）
+role: worker
+name: 代码评审-CodeWorker
+version: 1
+
+model:
+  tier: strong
+
+scope: 代码评审、CI 结果分析、技术决策记录建议
+
+triggers:
+  - 事件：pull_request opened / synchronize
+  - 事件：CI 失败
+  - Router 派发（bug 分析、仓库操作）
+
+permissions:
+  read: ["**"]                 # 知识库 + 目标代码仓库可读
+  write:
+    - 60-Outputs/              # 评审意见、CI 分析报告
+    - 50-Events/               # 事件记录（只追加）
+  forbidden:
+    - 10-Knowledge/            # 知识沉淀只读；ADR 建议交由 KnowledgeWorker 归档
+    - 40-Agents/
+    - 90-System/
+
+duties:
+  - PR 评审：完整意见写入 60-Outputs/YYYY-MM-DD/，PR 评论区只发摘要+链接
+  - CI 失败：根因 + 修复建议 → 60-Outputs/YYYY-MM-DD/
+  - 识别重大技术决策 → 起草 ADR 建议，交 KnowledgeWorker 归档到 10-Knowledge/Decisions/
+  - 评审口径沉淀：好的评审模式反哺建议给 KnowledgeWorker 提炼为 Playbook
+
+write_back:
+  mandatory: true
+  commit_prefix: "code:"
+  sync_command: "bash 90-System/sync/sync.sh"
+  report_to_router:
+    max_words: 100
+    must_include: [结论, 风险等级, 报告路径]

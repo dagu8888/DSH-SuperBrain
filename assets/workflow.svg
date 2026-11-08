@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" font-family="PingFang SC, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="a2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1 1 L7 4 L1 7 Z" fill="#7c5cff"/>
+    </marker>
+  </defs>
+  <rect width="960" height="300" rx="16" fill="#0f1117"/>
+  <text x="480" y="40" text-anchor="middle" font-size="20" font-weight="700" fill="#f2f3f7">全自动整理流水线</text>
+  <text x="480" y="62" text-anchor="middle" font-size="12" fill="#8b8f9e">丢进 Inbox 就完事，剩下的交给 Agent</text>
+
+  <g font-size="13" font-weight="600">
+    <rect x="40" y="110" width="150" height="80" rx="12" fill="#1e222e" stroke="#3a3f52"/>
+    <text x="115" y="145" text-anchor="middle" fill="#f2f3f7">① 丢笔记</text>
+    <text x="115" y="168" text-anchor="middle" font-size="11" font-weight="400" fill="#8b8f9e">00-Inbox/随便写</text>
+
+    <rect x="230" y="110" width="150" height="80" rx="12" fill="#241d3a" stroke="#7c5cff"/>
+    <text x="305" y="145" text-anchor="middle" fill="#c9bfff">② Router 派单</text>
+    <text x="305" y="168" text-anchor="middle" font-size="11" font-weight="400" fill="#a79bde">60 秒内发现</text>
+
+    <rect x="420" y="110" width="150" height="80" rx="12" fill="#13281c" stroke="#2f9e6e"/>
+    <text x="495" y="145" text-anchor="middle" fill="#6ee7a8">③ DeepSeek 读懂</text>
+    <text x="495" y="168" text-anchor="middle" font-size="11" font-weight="400" fill="#7fb598">分类·标题·摘要</text>
+
+    <rect x="610" y="110" width="150" height="80" rx="12" fill="#1e222e" stroke="#3a3f52"/>
+    <text x="685" y="145" text-anchor="middle" fill="#f2f3f7">④ 自动归档</text>
+    <text x="685" y="168" text-anchor="middle" font-size="11" font-weight="400" fill="#8b8f9e">10-Knowledge/</text>
+
+    <rect x="800" y="110" width="130" height="80" rx="12" fill="#1e222e" stroke="#3a3f52"/>
+    <text x="865" y="145" text-anchor="middle" fill="#f2f3f7">⑤ 同步回家</text>
+    <text x="865" y="168" text-anchor="middle" font-size="11" font-weight="400" fill="#8b8f9e">Obsidian 可见</text>
+  </g>
+
+  <g stroke="#7c5cff" stroke-width="2.5">
+    <line x1="192" y1="150" x2="226" y2="150" marker-end="url(#a2)"/>
+    <line x1="382" y1="150" x2="416" y2="150" marker-end="url(#a2)"/>
+    <line x1="572" y1="150" x2="606" y2="150" marker-end="url(#a2)"/>
+    <line x1="762" y1="150" x2="796" y2="150" marker-end="url(#a2)"/>
+  </g>
+
+  <text x="480" y="240" text-anchor="middle" font-size="12" fill="#565b6e">全程 ≤ 2 分钟 · 失败自动回滚 · 50-Events 全程留痕</text>
+  <text x="480" y="264" text-anchor="middle" font-size="12" fill="#565b6e">实测：3 篇杂乱笔记 → 2 分钟全部分类正确、带摘要入库</text>
+</svg>

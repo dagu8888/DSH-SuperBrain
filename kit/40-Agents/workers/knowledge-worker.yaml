@@ -1,0 +1,41 @@
+# KnowledgeWorker：知识整理与回写（强模型，上下文隔离）
+role: worker
+name: 知识整理-KnowledgeWorker
+version: 1
+
+model:
+  tier: strong
+  # 候选: claude-sonnet / gpt-4o / deepseek-reasoner
+
+scope: 知识库的整理、归档、双链维护、Inbox 清零、技能沉淀
+
+triggers:
+  - Router 派发（用户明确要求整理/归档/沉淀）
+  - 定时：每天 23:30 自动整理 00-Inbox
+  - 事件：00-Inbox 未整理文件数 >= 10
+
+permissions:
+  read: ["**"]                 # 全仓库可读
+  write:
+    - 00-Inbox/                # 清理与移出
+    - 10-Knowledge/            # 整理后的正式知识
+    - 20-Skills/               # 提炼技能
+    - 30-Reviews/              # 周报/整理报告
+  forbidden:
+    - 40-Agents/               # 系统配置只读
+    - 90-System/               # 运维脚本只读
+
+duties:
+  - 把 00-Inbox 内容分类移入 10-Knowledge/（Concepts | Playbooks | Decisions）
+  - 为笔记补充 [[]] 双链，消灭孤儿笔记
+  - 发现可复用流程 → 按 80-Templates/技能模板.md 提炼到 20-Skills/
+  - 每周日生成整理周报 → 30-Reviews/
+  - 移动文件后更新所有指向它的双链
+
+write_back:
+  mandatory: true              # 强制回写：不 commit & push 就不算完成
+  commit_prefix: "kb:"
+  sync_command: "bash 90-System/sync/sync.sh"
+  report_to_router:
+    max_words: 100
+    must_include: [结论, 涉及文件路径列表]

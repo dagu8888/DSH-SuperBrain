@@ -1,0 +1,13 @@
+[Unit]
+Description=Super-agent Runtime (Router + Workers)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/super-brain
+ExecStart=/usr/bin/python3 /root/super-brain/90-System/runtime/runtime.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,42 @@
+# 看门狗：定时巡查每个 Worker 健康 + 知识库同步状态
+role: watchdog
+name: 看门狗-Watchdog
+version: 1
+
+schedule: "*/10 * * * *"        # 每 10 分钟一轮（cron / systemd timer）
+
+checks:
+
+  worker_heartbeat:              # Worker 心跳（心跳写入数据库 heartbeats 表）
+    timeout_minutes: 15          # 超过 15 分钟无心跳 → 视为挂掉
+    action: restart_worker       # 先自动重启
+    escalate: 连续 3 次重启失败 → 告警人工
+
+  queue_backlog:                 # 任务队列积压（数据库 task_queue 表）
+    pending_threshold: 20        # 积压 > 20 单 → 告警
+    oldest_minutes: 30           # 最老 pending 任务 > 30 分钟 → 告警
+    action: alert
+
+  git_sync:                      # 知识库同步状态（watchdog.sh 直接可查）
+    auto_heal: true              # behind>0 自动 pull --rebase；有未推提交自动 push
+    stale_hours: 24              # 超过 24 小时无推送 → 告警"同步停滞"
+    conflict: alert              # rebase 冲突不自动处理 → 告警人工
+
+  inbox_backlog:                 # Inbox 积压
+    file_threshold: 10           # 未整理文件 >= 10 → 触发 KnowledgeWorker 整理
+    action: dispatch knowledge-worker
+
+  writeback_audit:               # 回写审计（每周日 23:00）
+    schedule: "0 23 * * 0"
+    rule: 比对 50-Events 任务记录 vs 60-Outputs 成果，缺成果的任务列入审计报告
+    action: 报告写 30-Reviews/ 并告警
+
+alert:
+  channels: [群消息, 邮件]        # 收件人：大古老师
+  format: |
+    【看门狗告警】{check_name}
+    状态：{异常详情}
+    已执行：{auto_action 或 "无，需人工"}
+
+logging:
+  path: 50-Events/watchdog-YYYY-MM-DD.jsonl   # 每轮巡检结果留痕（只追加）

@@ -1,0 +1,39 @@
+# ChatWorker：群聊对话与调研（强模型，上下文隔离）
+role: worker
+name: 群聊对话-ChatWorker
+version: 1
+
+model:
+  tier: strong
+
+scope: 群聊问答、资料调研、闲聊、日程提醒（默认兜底 Worker）
+
+triggers:
+  - Router 派发（无更匹配 Worker 时默认走这里）
+
+permissions:
+  read:
+    - 10-Knowledge/            # 先查知识库再作答
+    - 20-Skills/
+    - 30-Reviews/
+  write:
+    - 00-Inbox/                # 有价值的对话按聊天记录模板回写
+    - 60-Outputs/              # 调研报告
+  forbidden:
+    - 10-Knowledge/            # 写禁止：沉淀是 KnowledgeWorker 的活
+    - 40-Agents/
+    - 90-System/
+
+duties:
+  - 作答顺序：先检索 10-Knowledge/ 与 20-Skills/，命中则基于知识库回答并附 [[]] 引用；未命中再模型作答
+  - 有价值对话 → 按 80-Templates/聊天记录回写模板.md 写入 00-Inbox/
+  - 调研类任务 → 报告写 60-Outputs/YYYY-MM-DD/，群聊只回结论
+  - 提醒类任务 → 写 50-Events/ 登记，由 Gateway 定时触发
+
+write_back:
+  mandatory: true
+  commit_prefix: "chat:"
+  sync_command: "bash 90-System/sync/sync.sh"
+  report_to_router:
+    max_words: 100
+    must_include: [结论, 是否已回写, 回写路径]

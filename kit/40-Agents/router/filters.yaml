@@ -1,0 +1,82 @@
+# 事件快过滤规则：毫秒级，先于任何模型调用
+# 三级动作：
+#   DROP   丢弃（仅 append 到 50-Events/ 留痕，不占用任何模型资源）
+#   ALLOW  放行进入慢判断（Router 轻量模型分类）
+#   URGENT 跳过慢判断直接派单 + 立即回执用户
+# 规则自上而下匹配，命中即停；都不命中走 defaults.action
+version: 1
+
+defaults:
+  action: ALLOW
+  log_all: true            # 含 DROP 在内全部留痕 → 50-Events/YYYY-MM-DD.jsonl
+
+sources:
+
+  group_message:                       # 群消息
+    rules:
+      - name: 忽略机器人消息（防循环）
+        if: { sender_is_bot: true }
+        action: DROP
+      - name: 忽略灌水
+        if: { matches: '^\[?(表情|动画表情)\]?$|^(哈哈+|OK?|ok|👍|\+1|嗯|好)$' }
+        action: DROP
+      - name: 紧急关键词直达
+        if: { matches: '紧急|挂了|宕机|线上问题|崩了|urgent|down了' }
+        action: URGENT
+      - name: @我才处理
+        if: { mentioned: true }
+        action: ALLOW
+      - name: 其余群消息静默
+        action: DROP
+    note: 群聊默认静默：只响应 @机器人 或紧急词，其余只留痕
+
+  pull_request:                        # 代码评审
+    rules:
+      - name: 机器人 PR 忽略
+        if: { author_is_bot: true }
+        action: DROP
+      - name: 草稿 PR 忽略
+        if: { draft: true }
+        action: DROP
+      - name: 主分支 PR 加急评审
+        if: { base_branch: main, action_in: [opened, synchronize] }
+        action: URGENT
+        dispatch: code-worker
+      - name: 其他分支常规评审
+        if: { action_in: [opened, synchronize] }
+        action: ALLOW
+        dispatch: code-worker
+
+  ci_result:                           # CI 结果
+    rules:
+      - name: CI 成功只留痕
+        if: { conclusion: success }
+        action: DROP
+      - name: CI 失败加急
+        if: { conclusion_in: [failure, timed_out] }
+        action: URGENT
+        dispatch: code-worker
+
+  email:                               # 邮件
+    rules:
+      - name: 订阅/营销邮件丢弃
+        if: { header_contains: 'List-Unsubscribe' }
+        action: DROP
+      - name: 重要发件人加急
+        if: { from_in: '${IMPORTANT_CONTACTS}' }   # 环境变量注入，勿写死
+        action: URGENT
+      - name: 其他邮件进慢判断
+        action: ALLOW
+
+  kb_change:                           # 知识库变更（push webhook）
+    rules:
+      - name: 配置区被改 → 红色告警
+        if: { paths_match: '40-Agents/**|90-System/**' }
+        action: URGENT
+        note: 配置改动必须人工 PR；Agent 自动改配置视为异常事件
+      - name: Inbox 有新料 → 提醒整理
+        if: { paths_match: '00-Inbox/**' }
+        action: ALLOW
+        dispatch: knowledge-worker
+      - name: 其他目录变更只留痕
+        action: DROP
