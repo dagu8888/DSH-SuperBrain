@@ -12,6 +12,8 @@
 [![Runtime](https://img.shields.io/badge/runtime-Python3.8%2B%20纯标准库-2f9e6e)](#)
 [![Cost](https://img.shields.io/badge/成本-不到60元%2F月-ff7a45)](#-成本)
 [![Deploy](https://img.shields.io/badge/部署-Agent%20全自动-7c5cff)](AGENTS.md)
+[![dshTarget](https://img.shields.io/badge/dshTarget-rc.6-blue)](#dsh-插件)
+[![Listed on dsh-plugin.org](https://dsh-plugin.org/badges/listed.svg)](https://dsh-plugin.org/plugins/dagu8888/dsh-plugin-superbrain)
 
 </div>
 
@@ -65,6 +67,25 @@
 ## 快速开始 —— 让你的 Agent 来装
 
 这是 SuperBrain 最骚的用法：**你一行命令都不用敲**。
+
+### DSH 插件
+
+如果你在用 [DeepSeek Harness](https://www.deepseek.com/harness/)，一条命令装进你的 DSH：
+
+```bash
+dsh plugin --profile web add github:dagu8888/DSH-SuperBrain
+```
+
+装上后获得两个新工具：
+
+| 工具 | 干什么 |
+|---|---|
+| `superbrain_remember` | 把当前对话里值得长期记住的内容写进云大脑（00-Inbox），云端 Agent 2 分钟内自动分类归档 |
+| `superbrain_sync` | 立即触发知识库 ⇄ 云端双向同步 |
+
+> 兼容性：声明 `dshTarget: rc.6`（DSH 处于开发者预览期，如遇破坏性变更请提 issue）。插件本体见 [index.js](index.js)，纯 Node 标准库，零依赖。
+
+### 手动 / 其他 Agent
 
 ```bash
 git clone https://github.com/dagu8888/DSH-SuperBrain.git

@@ -1,0 +1,26 @@
+{
+  "name": "dsh-plugin-superbrain",
+  "version": "1.0.0",
+  "description": "Obsidian 双联云记忆 Super-Agent 架构：一键部署你的 7×24 云大脑，并为 DSH 增加 Inbox 记忆写入与同步工具",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "obsidian",
+    "memory",
+    "knowledge-base",
+    "ai-agent",
+    "superbrain"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "target": "rc.6",
+    "category": "记忆与上下文",
+    "profiles": ["web", "headless"],
+    "homepage": "https://github.com/dagu8888/DSH-SuperBrain"
+  }
+}
